@@ -111,7 +111,10 @@ func ParseVerify(idToken string) (*Payload, error) {
 	return p, nil
 }
 
-func Init(id, secret, redirectURI string) (err error) {
+func Init(id, secret, redirect string) (err error) {
+	clientID = id
+	clientSecret = secret
+	redirectURI = redirect
 	resp, err := http.Get(MetadataAPI)
 	if err != nil {
 		return
