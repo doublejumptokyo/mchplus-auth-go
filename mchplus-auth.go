@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -60,11 +61,15 @@ func GetToken(code string) (*Token, error) {
 	values.Set("client_id", clientID)
 	values.Set("client_secret", clientSecret)
 
-	resp, err := http.Post(TokenAPI, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
+	resp, err := http.PostForm(TokenAPI, values)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Backend response is %s", resp.StatusCode)
+	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -120,6 +125,10 @@ func Init(id, secret, redirect string) (err error) {
 		return
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("Backend response is %s", resp.StatusCode)
+	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
