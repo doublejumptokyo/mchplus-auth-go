@@ -8,6 +8,7 @@ import (
 	"encoding/pem"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/lestrrat-go/jwx/jwa"
@@ -16,10 +17,24 @@ import (
 	"github.com/pkg/errors"
 )
 
-const MetadataAPI = "https://auth.mch.plus/api/metadata/x509"
 const alg = jwa.RS256
 
-var cached = map[string]*Metadata{}
+var (
+	MetadataAPI  = "https://auth.mch.plus/api/metadata/x509"
+	TokenAPI     = "https://auth.mch.plus/api/token"
+	cached       = map[string]*Metadata{}
+	clientID     = ""
+	clientSecret = ""
+	redirectURI  = ""
+)
+
+type Token struct {
+	AccessToken  string `json:"access_token"`
+	TokenType    string `json:"token_type"`
+	ExpiresIn    int64  `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	IDToken      string `json:"id_token"`
+}
 
 type Headers struct {
 	jws.StandardHeaders
@@ -37,7 +52,29 @@ func Get() (map[string]*Metadata, error) {
 	return cached, nil
 }
 
-func GetHeaders(idToken string) (*Headers, error) {
+func GetToken(code string) (*Token, error) {
+	values := new(url.Values)
+	values.Set("grant_type", "authorization_code")
+	values.Set("code", code)
+	values.Set("redirect_uri", redirectURI)
+	values.Set("client_id", clientID)
+	values.Set("client_secret", clientSecret)
+
+	resp, err := http.Post(TokenAPI, "application/x-www-form-urlencoded", strings.NewReader(values.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	t := new(Token)
+	return t, json.Unmarshal(body, t)
+}
+
+func ParseHeaders(idToken string) (*Headers, error) {
 	raw := strings.Split(idToken, ".")[0]
 
 	b, err := base64.RawStdEncoding.DecodeString(raw)
@@ -52,7 +89,7 @@ func GetHeaders(idToken string) (*Headers, error) {
 
 func ParseVerify(idToken string) (*Payload, error) {
 
-	h, err := GetHeaders(idToken)
+	h, err := ParseHeaders(idToken)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +111,7 @@ func ParseVerify(idToken string) (*Payload, error) {
 	return p, nil
 }
 
-func Init() (err error) {
+func Init(id, secret, redirectURI string) (err error) {
 	resp, err := http.Get(MetadataAPI)
 	if err != nil {
 		return
