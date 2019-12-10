@@ -21,12 +21,9 @@ import (
 const alg = jwa.RS256
 
 var (
-	MetadataAPI  = "https://auth.mch.plus/api/metadata/x509"
-	TokenAPI     = "https://auth.mch.plus/api/token"
-	cached       = map[string]*Metadata{}
-	clientID     = ""
-	clientSecret = ""
-	redirectURI  = ""
+	MetadataAPI = "https://auth.mch.plus/api/metadata/x509"
+	TokenAPI    = "https://auth.mch.plus/api/token"
+	cached      = map[string]*Metadata{}
 )
 
 type Token struct {
@@ -53,7 +50,7 @@ func Get() (map[string]*Metadata, error) {
 	return cached, nil
 }
 
-func GetToken(code string) (*Token, error) {
+func GetToken(clientID, clientSecret, redirectURI, code string) (*Token, error) {
 	values := url.Values{}
 	values.Set("grant_type", "authorization_code")
 	values.Set("code", code)
@@ -68,7 +65,7 @@ func GetToken(code string) (*Token, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Backend response is %s", resp.StatusCode)
+		return nil, fmt.Errorf("Backend returns status %d", resp.StatusCode)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -116,10 +113,7 @@ func ParseVerify(idToken string) (*Payload, error) {
 	return p, nil
 }
 
-func Init(id, secret, redirect string) (err error) {
-	clientID = id
-	clientSecret = secret
-	redirectURI = redirect
+func Init() (err error) {
 	resp, err := http.Get(MetadataAPI)
 	if err != nil {
 		return
@@ -127,7 +121,7 @@ func Init(id, secret, redirect string) (err error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("Backend response is %s", resp.StatusCode)
+		return fmt.Errorf("Backend returns status %d", resp.StatusCode)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
