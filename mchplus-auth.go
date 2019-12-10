@@ -53,7 +53,7 @@ func Get() (map[string]*Metadata, error) {
 }
 
 func GetToken(code string) (*Token, error) {
-	values := new(url.Values)
+	values := url.Values{}
 	values.Set("grant_type", "authorization_code")
 	values.Set("code", code)
 	values.Set("redirect_uri", redirectURI)
