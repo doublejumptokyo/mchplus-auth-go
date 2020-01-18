@@ -3,14 +3,17 @@ package mchplus_auth
 import (
 	"encoding/json"
 	"net/url"
+
+	"github.com/doublejumptokyo/mchplus-auth-go/utils"
 )
 
-func Authorize(address string) (msg string, state int64, err error) {
+func Authorize(address string) (msg string, state string, err error) {
 
+	state = utils.RandNumberString(6)
 	q := make(url.Values)
 	q.Set("response_type", "code")
 	q.Set("client_id", ClientID)
-	q.Set("state", "11111")
+	q.Set("state", state)
 	q.Set("scope", "openid")
 	q.Set("redirect_uri", RedirectURI)
 	b, err := get("/authorize?" + q.Encode())
@@ -21,5 +24,5 @@ func Authorize(address string) (msg string, state int64, err error) {
 	res := map[string]string{}
 	err = json.Unmarshal(b, &res)
 
-	return res["message"], 11111, err
+	return res["message"], state, err
 }
