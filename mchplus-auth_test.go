@@ -22,8 +22,11 @@ var (
 
 func TestUserinfo(t *testing.T) {
 	is := initializeTest(t)
-	is.Nil(nil)
-	print(accessToken)
+
+	u, err := GetUserInfo(accessToken)
+	is.Nil(err)
+
+	print(u)
 }
 
 func TestLogin(t *testing.T) {

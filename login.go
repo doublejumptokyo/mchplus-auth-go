@@ -57,7 +57,7 @@ func Authorize(address string) (msg string, state string, err error) {
 	q.Set("scope", "openid")
 	q.Set("redirect_uri", RedirectURI)
 	q.Set("address", address)
-	b, err := get("/authorize?" + q.Encode())
+	b, err := get("/authorize?"+q.Encode(), "")
 	if err != nil {
 		return
 	}

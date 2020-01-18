@@ -24,12 +24,17 @@ var (
 	cached       = map[string]*Metadata{}
 )
 
-func get(path string) ([]byte, error) {
+func get(path string, authorization string) ([]byte, error) {
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
 
-	resp, err := http.Get(AuthAPI + path)
+	client := new(http.Client)
+	req, err := http.NewRequest("GET", AuthAPI+path, nil)
+	if authorization != "" {
+		req.Header.Add("Authorization", "Bearer "+authorization)
+	}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +79,7 @@ func Init(clientID, clientSecret, redirectURI string) (err error) {
 	ClientID = clientID
 	ClientSecret = clientSecret
 	RedirectURI = redirectURI
-	body, err := get("/metadata/x509")
+	body, err := get("/metadata/x509", "")
 	if err != nil {
 		return
 	}
