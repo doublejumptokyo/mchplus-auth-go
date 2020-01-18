@@ -35,13 +35,13 @@ type Metadata struct {
 	PublicKey *rsa.PublicKey
 }
 
-func GetToken(clientID, clientSecret, redirectURI, code string) (*Token, error) {
+func GetToken(code string) (*Token, error) {
 	values := url.Values{}
 	values.Set("grant_type", "authorization_code")
 	values.Set("code", code)
-	values.Set("redirect_uri", redirectURI)
-	values.Set("client_id", clientID)
-	values.Set("client_secret", clientSecret)
+	values.Set("redirect_uri", RedirectURI)
+	values.Set("client_id", ClientID)
+	values.Set("client_secret", ClientSecret)
 	tokenAPI := AuthAPI + "/token"
 	resp, err := http.PostForm(tokenAPI, values)
 	if err != nil {
@@ -53,8 +53,6 @@ func GetToken(clientID, clientSecret, redirectURI, code string) (*Token, error) 
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(string(body))
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("Backend returns status %d", resp.StatusCode)

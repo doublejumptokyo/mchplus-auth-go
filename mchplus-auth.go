@@ -1,6 +1,7 @@
 package mchplus_auth
 
 import (
+	"bytes"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
@@ -34,39 +35,39 @@ func get(path string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Backend returns status %d", resp.StatusCode)
-	}
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Backend returns status %d msg: %s", resp.StatusCode, string(body))
 	}
 
 	return body, nil
 }
 
-func post(path string) ([]byte, error) {
+func post(path string, body []byte) ([]byte, error) {
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
 
-	resp, err := http.Get(AuthAPI + path)
+	resp, err := http.Post(AuthAPI+path, "application/json", bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Backend returns status %d", resp.StatusCode)
-	}
-
-	body, err := ioutil.ReadAll(resp.Body)
+	ret, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
-	return body, nil
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("Backend returns status %d msg: %s", resp.StatusCode, string(ret))
+	}
+
+	return ret, nil
 }
 
 func Init(clientID, clientSecret, redirectURI string) (err error) {
