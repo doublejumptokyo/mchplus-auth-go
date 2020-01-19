@@ -2,9 +2,7 @@ package mchplus_auth
 
 import (
 	"bytes"
-	"crypto/x509"
 	"encoding/json"
-	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -21,8 +19,56 @@ var (
 	ClientID     = ""
 	ClientSecret = ""
 	RedirectURI  = ""
-	cached       = map[string]*Metadata{}
+	Client       = &ClientInfo{}
 )
+
+type ClientInfo struct {
+	ClientID    string `json:"client_id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	LogoURL     string `json:"logo_url"`
+	HomeURL     string `json:"home_url"`
+}
+
+func ParseIDToken(idToken string, now int64) (p *Payload, err error) {
+	p, err = ParseVerify(idToken)
+	if err != nil {
+		return
+	}
+	if p.IssuedAt().Unix() > now {
+		return nil, errors.New("id token error: issueAt")
+	}
+
+	if p.Expiration().Unix() < now {
+		return nil, errors.New("id token error: expire")
+	}
+
+	for _, a := range p.Audience() {
+		if a == Client.HomeURL {
+			return
+		}
+	}
+
+	return nil, errors.New("id token error: audience")
+}
+
+func Init(clientID, clientSecret, redirectURI string) (err error) {
+	ClientID = clientID
+	ClientSecret = clientSecret
+	RedirectURI = redirectURI
+	Client, err = GetClient()
+	return err
+}
+
+func GetClient() (*ClientInfo, error) {
+	b, err := get("/client?client_id="+ClientID, "")
+	if err != nil {
+		return nil, err
+	}
+
+	ret := new(ClientInfo)
+	return ret, json.Unmarshal(b, ret)
+}
 
 func get(path string, authorization string) ([]byte, error) {
 	if !strings.HasPrefix(path, "/") {
@@ -73,35 +119,4 @@ func post(path string, body []byte) ([]byte, error) {
 	}
 
 	return ret, nil
-}
-
-func Init(clientID, clientSecret, redirectURI string) (err error) {
-	ClientID = clientID
-	ClientSecret = clientSecret
-	RedirectURI = redirectURI
-	body, err := get("/metadata/x509", "")
-	if err != nil {
-		return
-	}
-	res := map[string]string{}
-	err = json.Unmarshal(body, &res)
-	if err != nil {
-		return
-	}
-
-	for k, v := range res {
-		block, _ := pem.Decode([]byte(v))
-		if block == nil {
-			return errors.New("invalid public key data")
-		}
-		var err error
-		c := new(Metadata)
-		c.PublicKey, err = x509.ParsePKCS1PublicKey(block.Bytes)
-		if err != nil {
-			return err
-		}
-		cached[k] = c
-	}
-
-	return nil
 }

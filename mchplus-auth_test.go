@@ -1,8 +1,10 @@
 package mchplus_auth
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/cheekybits/is"
@@ -19,6 +21,13 @@ var (
 	user        = &signer.Signer{}
 	accessToken = os.Getenv("ACCESS_TOKEN")
 )
+
+func TestGetClient(t *testing.T) {
+	is := initializeTest(t)
+	c, err := GetClient()
+	is.Nil(err)
+	print(*c)
+}
 
 func initializeTest(t *testing.T) is.I {
 	is := is.New(t)
@@ -37,5 +46,9 @@ func initializeTest(t *testing.T) is.I {
 }
 
 func print(in interface{}) {
+	if reflect.TypeOf(in).Kind() == reflect.Struct {
+		in, _ = json.Marshal(in)
+		in = string(in.([]byte))
+	}
 	fmt.Println(in)
 }

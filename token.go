@@ -2,8 +2,10 @@ package mchplus_auth
 
 import (
 	"crypto/rsa"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -13,6 +15,10 @@ import (
 	"github.com/lestrrat-go/jwx/jws"
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/pkg/errors"
+)
+
+var (
+	cachedMetadata = map[string]*Metadata{}
 )
 
 type Token struct {
@@ -81,12 +87,24 @@ func ParseVerify(idToken string) (*Payload, error) {
 	if err != nil {
 		return nil, err
 	}
-	kid, ok := h.Get("kid")
+	ikid, _ := h.Get("kid")
+	kid := ikid.(string)
+
+	m := new(Metadata)
+	ok := false
+	m, ok = cachedMetadata[kid]
 	if !ok {
-		return nil, errors.New("kid not found")
+		err = fetchMetadata()
+		if err != nil {
+			return nil, err
+		}
+		m, ok = cachedMetadata[kid]
+		if !ok {
+			return nil, errors.New("kid not found")
+		}
 	}
 
-	v, err := jws.Verify([]byte(idToken), alg, cached[kid.(string)].PublicKey)
+	v, err := jws.Verify([]byte(idToken), alg, m.PublicKey)
 	if err != nil {
 		return nil, errors.Wrap(err, `failed to verify jws signature`)
 	}
@@ -97,4 +115,31 @@ func ParseVerify(idToken string) (*Payload, error) {
 	}
 
 	return p, nil
+}
+
+func fetchMetadata() (err error) {
+	body, err := get("/metadata/x509", "")
+	if err != nil {
+		return
+	}
+	res := map[string]string{}
+	err = json.Unmarshal(body, &res)
+	if err != nil {
+		return
+	}
+
+	for k, v := range res {
+		block, _ := pem.Decode([]byte(v))
+		if block == nil {
+			return errors.New("invalid public key data")
+		}
+		var err error
+		c := new(Metadata)
+		c.PublicKey, err = x509.ParsePKCS1PublicKey(block.Bytes)
+		if err != nil {
+			return err
+		}
+		cachedMetadata[k] = c
+	}
+	return
 }

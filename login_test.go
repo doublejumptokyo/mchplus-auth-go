@@ -1,7 +1,9 @@
 package mchplus_auth
 
 import (
+	"encoding/json"
 	"testing"
+	"time"
 )
 
 func TestLogin(t *testing.T) {
@@ -23,4 +25,10 @@ func TestLogin(t *testing.T) {
 	is.Nil(err)
 	accessToken = token.AccessToken
 	print(accessToken)
+
+	p, err := ParseIDToken(token.IDToken, time.Now().Unix())
+	is.Nil(err)
+	b, err := json.Marshal(p)
+	is.Nil(err)
+	print(string(b))
 }
