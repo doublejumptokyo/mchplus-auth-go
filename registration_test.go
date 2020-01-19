@@ -15,7 +15,11 @@ func TestRegisterRegion(t *testing.T) {
 func TestRegisterPhone(t *testing.T) {
 	is := initializeTest(t)
 	print(user.Address())
-	number := flag.Args()[0]
+	args := flag.Args()
+	if len(args) == 0 {
+		t.Skip()
+	}
+	number := args[0]
 	print(number)
 	err := RegisterPhone(user.Address(), number)
 	is.Nil(err)
@@ -24,7 +28,11 @@ func TestRegisterPhone(t *testing.T) {
 func TestConfirmPhone(t *testing.T) {
 	is := initializeTest(t)
 	print(user.Address())
-	code := flag.Args()[0]
+	args := flag.Args()
+	if len(args) == 0 {
+		t.Skip()
+	}
+	code := args[0]
 	sig, err := user.PersonalSign("Code:" + code)
 	is.Nil(err)
 	err = ConfirmPhone(user.Address(), sig, "mainnet")
