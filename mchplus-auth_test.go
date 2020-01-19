@@ -20,15 +20,6 @@ var (
 	accessToken = os.Getenv("ACCESS_TOKEN")
 )
 
-func TestUserinfo(t *testing.T) {
-	is := initializeTest(t)
-
-	u, err := GetUserInfo(accessToken)
-	is.Nil(err)
-
-	print(u)
-}
-
 func TestLogin(t *testing.T) {
 	is := initializeTest(t)
 	print(user.Address())

@@ -40,6 +40,7 @@ func ConfirmPhone(address, signature, network string) (err error) {
 	in := map[string]string{
 		"address": address,
 		"sig":     signature,
+		"network": network,
 	}
 	b, err := json.Marshal(in)
 	if err != nil {
