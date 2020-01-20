@@ -19,6 +19,11 @@ func init() {
 	)
 }
 
+func getToken(string code) (accessToken string, idToken string, err error) {
+    token, err := mchplus_auth.GetToken(code)
+	return token.AccessToken, token.IDToken, err
+}
+
 func authMiddleware() error {
 	var idToken string
 	now := time.Now().Unix()
@@ -29,6 +34,11 @@ func authMiddleware() error {
 
 	fmt.Printf("Hello address: ", p.Subject())
 	return nil
+}
+
+func userInfo(accessToken string) (phoneHash string, error) {
+    u, err := mchplus_auth.GetUserInfo(accessToken)
+	return u.PhoneHash, err
 }
 ```
 
