@@ -37,8 +37,12 @@ func initializeTest(t *testing.T) is.I {
 		AuthAPI = os.Getenv("AUTH_API")
 	}
 
-	user, err = signer.NewSignerFromHex(os.Getenv("PRIVATE_KEY"))
-	is.Nil(err)
+	if os.Getenv("PRIVATE_KEY") != "" {
+		user, err = signer.NewSignerFromHex(os.Getenv("PRIVATE_KEY"))
+		is.Nil(err)
+	} else {
+		user = nil
+	}
 
 	err = Init(clientID, clientSecret, redirectURI)
 	is.Nil(err)

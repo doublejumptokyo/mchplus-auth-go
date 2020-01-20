@@ -8,6 +8,9 @@ import (
 
 func TestLogin(t *testing.T) {
 	is := initializeTest(t)
+	if user == nil {
+		t.Skip()
+	}
 	print(user.Address())
 	msg, state, err := Authorize(user.Address())
 	is.Nil(err)

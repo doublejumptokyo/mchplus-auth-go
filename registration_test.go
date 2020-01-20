@@ -7,6 +7,9 @@ import (
 
 func TestRegisterRegion(t *testing.T) {
 	is := initializeTest(t)
+	if user == nil {
+		t.Skip()
+	}
 	print(user.Address())
 	err := RegisterRegion(user.Address(), "JPN")
 	is.Nil(err)
@@ -14,6 +17,10 @@ func TestRegisterRegion(t *testing.T) {
 
 func TestRegisterPhone(t *testing.T) {
 	is := initializeTest(t)
+	if user == nil {
+		t.Skip()
+	}
+
 	print(user.Address())
 	args := flag.Args()
 	if len(args) == 0 {
@@ -27,6 +34,10 @@ func TestRegisterPhone(t *testing.T) {
 
 func TestConfirmPhone(t *testing.T) {
 	is := initializeTest(t)
+	if user == nil {
+		t.Skip()
+	}
+
 	print(user.Address())
 	args := flag.Args()
 	if len(args) == 0 {
