@@ -17,7 +17,9 @@ func TestGetAddressFromInviteCode(t *testing.T) {
 	}
 	address, err := GetAddressFromInviteCode(testInviteCode)
 	is.Nil(err)
-	print(address)
+	if address != testAddress {
+		t.Errorf("got %v\nwant %v", address, testAddress)
+	}
 }
 
 func TestGetInviteCodeFromAddress(t *testing.T) {
@@ -27,5 +29,7 @@ func TestGetInviteCodeFromAddress(t *testing.T) {
 	}
 	inviteCode, err := GetInviteCodeFromAddress(testAddress)
 	is.Nil(err)
-	print(inviteCode)
+	if inviteCode != testInviteCode {
+		t.Errorf("got %v\nwant %v", inviteCode, testInviteCode)
+	}
 }
