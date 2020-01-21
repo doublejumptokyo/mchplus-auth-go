@@ -5,11 +5,10 @@ import (
 )
 
 type UserInfo struct {
-	Address     string `json:"address"`
-	PhoneHash   string `json:"phone_hash"`
-	Region      string `json:"region"`
-	FirstClient string `json:"first_client"`
-	Since       int64  `json:"since"`
+	Address    string `json:"address"`
+	InviteCode string `json:"invite_code"`
+	PhoneHash  string `json:"phone_hash,omitempty"`
+	Region     string `json:"region,omitempty"`
 }
 
 func GetUserInfo(accessToken string) (u *UserInfo, err error) {
