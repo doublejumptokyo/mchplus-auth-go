@@ -13,5 +13,5 @@ func TestUserinfo(t *testing.T) {
 	u, err := GetUserInfo(accessToken)
 	is.Nil(err)
 
-	print(u)
+	print(*u)
 }
