@@ -10,8 +10,13 @@ func TestRegisterRegion(t *testing.T) {
 	if user == nil {
 		t.Skip()
 	}
+	args := flag.Args()
+	if len(args) == 0 {
+		t.Skip()
+	}
+	region := args[0]
 	print(user.Address())
-	err := RegisterRegion(user.Address(), "JPN")
+	err := RegisterRegion(user.Address(), region)
 	is.Nil(err)
 }
 
