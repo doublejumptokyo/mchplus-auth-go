@@ -6,7 +6,7 @@ import (
 
 func TestSetClientSince(t *testing.T) {
 	is := initializeTest(t)
-	if testInviteCode == "" {
+	if testAddress == "" || testSince == "" {
 		t.Skip()
 	}
 	err := SetClientSince(testAddress, testSince)
