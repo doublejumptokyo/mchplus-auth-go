@@ -22,6 +22,12 @@ var (
 	accessToken = os.Getenv("ACCESS_TOKEN")
 )
 
+var (
+	testAddress    = os.Getenv("ADDRESS")
+	testInviteCode = os.Getenv("INVITE_CODE")
+	testSince      = os.Getenv("CLIENT_SINCE")
+)
+
 func TestGetClient(t *testing.T) {
 	is := initializeTest(t)
 	c, err := GetClient()

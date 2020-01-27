@@ -1,13 +1,7 @@
 package mchplus_auth
 
 import (
-	"os"
 	"testing"
-)
-
-var (
-	testAddress    = os.Getenv("ADDRESS")
-	testInviteCode = os.Getenv("INVITE_CODE")
 )
 
 func TestGetAddressFromInviteCode(t *testing.T) {
