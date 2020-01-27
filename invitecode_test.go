@@ -15,8 +15,11 @@ func TestGetAddressFromInviteCode(t *testing.T) {
 	if testInviteCode == "" {
 		t.Skip()
 	}
-	address, err := GetAddressFromInviteCode(testInviteCode)
+	ok, address, err := GetAddressFromInviteCode(testInviteCode)
 	is.Nil(err)
+	if !ok {
+		t.Errorf("ok is false")
+	}
 	if address != testAddress {
 		t.Errorf("got %v\nwant %v", address, testAddress)
 	}

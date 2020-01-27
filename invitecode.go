@@ -16,7 +16,7 @@ type addressOutput struct {
 	ClientSecret string `json:"client_secret"`
 }
 
-func GetAddressFromInviteCode(inviteCode string) (address string, err error) {
+func GetAddressFromInviteCode(inviteCode string) (ok bool, address string, err error) {
 	in := map[string]string{
 		"invite_code":   inviteCode,
 		"client_id":     ClientID,
@@ -36,6 +36,7 @@ func GetAddressFromInviteCode(inviteCode string) (address string, err error) {
 		return
 	}
 	address = o.Address
+	ok = address != "0x0000000000000000000000000000000000000000"
 	return
 }
 
