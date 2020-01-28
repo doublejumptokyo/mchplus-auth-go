@@ -33,6 +33,7 @@ func GetUserinfoPermissioned(address string) (u *UserInfo, err error) {
 	if err != nil {
 		return
 	}
+	u = new(UserInfo)
 	err = json.Unmarshal(b, u)
 	return
 }
