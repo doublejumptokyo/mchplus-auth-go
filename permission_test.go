@@ -12,3 +12,14 @@ func TestSetClientSince(t *testing.T) {
 	err := SetClientSince(testAddress, testSince)
 	is.Nil(err)
 }
+
+func TestGetUserinfoPermissioned(t *testing.T) {
+	is := initializeTest(t)
+	if testAddress == "" {
+		t.Skip()
+	}
+	u, err := GetUserinfoPermissioned(testAddress)
+	is.Nil(err)
+
+	print(*u)
+}
