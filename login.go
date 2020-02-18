@@ -9,21 +9,23 @@ import (
 )
 
 type loginInput struct {
-	Address   string `json:"address"`
-	ClientID  string `json:"client_id"`
-	Signature string `json:"signature"`
-	Network   string `json:"network"`
-	Lang      string `json:"lang"`
-	State     string `json:"state"`
+	Address     string `json:"address"`
+	ClientID    string `json:"client_id"`
+	Signature   string `json:"signature"`
+	Network     string `json:"network"`
+	RedirectURI string `json:"redirect_uri"`
+	Lang        string `json:"lang"`
+	State       string `json:"state"`
 }
 
 func Login(signature, address, state, network string) (code string, err error) {
 	in := map[string]string{
-		"address":   address,
-		"client_id": ClientID,
-		"signature": signature,
-		"network":   network,
-		"state":     state,
+		"address":      address,
+		"client_id":    ClientID,
+		"signature":    signature,
+		"network":      network,
+		"redirect_uri": RedirectURI,
+		"state":        state,
 	}
 	inb, err := json.Marshal(in)
 	if err != nil {

@@ -18,7 +18,7 @@ func TestLogin(t *testing.T) {
 
 	sig, err := user.PersonalSign(msg)
 	is.Nil(err)
-	// print(sig)
+	print(sig)
 
 	code, err := Login(sig, user.Address(), state, "mainnet")
 	is.Nil(err)
