@@ -2,10 +2,10 @@ package mchplus_auth
 
 import (
 	"encoding/json"
+	"errors"
 	"net/url"
 
 	"github.com/doublejumptokyo/mchplus-auth-go/utils"
-	"github.com/pkg/errors"
 )
 
 type loginInput struct {

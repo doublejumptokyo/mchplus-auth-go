@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 
 	"github.com/lestrrat-go/jwx/jws"
 	"github.com/lestrrat-go/jwx/jwt"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -106,12 +106,12 @@ func ParseVerify(idToken string) (*Payload, error) {
 
 	v, err := jws.Verify([]byte(idToken), alg, m.PublicKey)
 	if err != nil {
-		return nil, errors.Wrap(err, `failed to verify jws signature`)
+		return nil, fmt.Errorf("failed to verify jws signature: %w", err)
 	}
 
 	p := new(Payload)
 	if err := json.Unmarshal(v, p); err != nil {
-		return nil, errors.Wrap(err, `failed to parse token`)
+		return nil, fmt.Errorf("failed to parse token: %w", err)
 	}
 
 	return p, nil
