@@ -3,13 +3,13 @@ package mchplus_auth
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
 
 	"github.com/lestrrat-go/jwx/jwa"
-	"github.com/pkg/errors"
 )
 
 const alg = jwa.RS256
@@ -35,21 +35,26 @@ func ParseIDToken(idToken string, now int64) (p *Payload, err error) {
 	if err != nil {
 		return
 	}
+
+	return p, CheckValidIDToken(p, now, Client.HomeURL)
+}
+
+func CheckValidIDToken(p *Payload, now int64, homeURL string) error {
 	if p.IssuedAt().Unix() > now {
-		return nil, errors.New("id token error: issueAt")
+		return errors.New("id token error: issueAt")
 	}
 
 	if p.Expiration().Unix() < now {
-		return nil, errors.New("id token error: expire")
+		return errors.New("id token error: expire")
 	}
 
 	for _, a := range p.Audience() {
-		if a == Client.HomeURL {
-			return
+		if a == homeURL {
+			return nil
 		}
 	}
 
-	return nil, errors.New("id token error: audience")
+	return errors.New("id token error: audience")
 }
 
 func Init(clientID, clientSecret, redirectURI string) (err error) {

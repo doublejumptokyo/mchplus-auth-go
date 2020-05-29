@@ -6,5 +6,4 @@ require (
 	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927
 	github.com/ethereum/go-ethereum v1.9.10
 	github.com/lestrrat-go/jwx v0.9.0
-	github.com/pkg/errors v0.9.1
 )
