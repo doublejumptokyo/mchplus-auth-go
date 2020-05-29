@@ -15,6 +15,12 @@ import (
 const alg = jwa.RS256
 
 var (
+	ErrInvalidIDTokenAud = errors.New("id token error: audience")
+	ErrInvalidIDTokenExp = errors.New("id token error: expire")
+	ErrInvalidIDTokenIat = errors.New("id token error: issueAt")
+)
+
+var (
 	AuthAPI      = "https://auth.mch.plus/api"
 	ClientID     = ""
 	ClientSecret = ""
@@ -41,11 +47,11 @@ func ParseIDToken(idToken string, now int64) (p *Payload, err error) {
 
 func CheckValidIDToken(p *Payload, now int64, homeURL string) error {
 	if p.IssuedAt().Unix() > now {
-		return errors.New("id token error: issueAt")
+		return ErrInvalidIDTokenIat
 	}
 
 	if p.Expiration().Unix() < now {
-		return errors.New("id token error: expire")
+		return ErrInvalidIDTokenExp
 	}
 
 	for _, a := range p.Audience() {
@@ -54,7 +60,7 @@ func CheckValidIDToken(p *Payload, now int64, homeURL string) error {
 		}
 	}
 
-	return errors.New("id token error: audience")
+	return ErrInvalidIDTokenAud
 }
 
 func Init(clientID, clientSecret, redirectURI string) (err error) {
