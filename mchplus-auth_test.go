@@ -61,6 +61,8 @@ func TestMain(m *testing.M) {
 		AuthAPI = os.Getenv("AUTH_API")
 	}
 
+	fmt.Println("connectiong to ", AuthAPI)
+
 	if os.Getenv("PRIVATE_KEY") != "" {
 		user, err = signer.NewSignerFromHex(os.Getenv("PRIVATE_KEY"))
 		if err != nil {
