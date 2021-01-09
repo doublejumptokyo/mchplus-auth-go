@@ -54,3 +54,47 @@ func TestConfirmPhone(t *testing.T) {
 	err = ConfirmPhone(user.Address(), sig, "mainnet")
 	is.Nil(err)
 }
+
+func TestRegisterBirthday(t *testing.T) {
+	type args struct {
+		address  string
+		birthday string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "ok",
+			args: args{
+				"0xd868711BD9a2C6F1548F5f4737f71DA67d821090",
+				"2020-04-20",
+			},
+			wantErr: false,
+		},
+		{
+			name: "wrong data",
+			args: args{
+				"0xd868711BD9a2C6F1548F5f4737f71DA67d821090",
+				"2020-04-21",
+			},
+			wantErr: true,
+		},
+		{
+			name: "parse error",
+			args: args{
+				"0xd868711BD9a2C6F1548F5f4737f71DA67d821090",
+				"20200420",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := RegisterBirthday(tt.args.address, tt.args.birthday); (err != nil) != tt.wantErr {
+				t.Errorf("RegisterBirthday() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

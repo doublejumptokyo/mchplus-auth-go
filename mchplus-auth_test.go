@@ -55,6 +55,30 @@ func initializeTest(t *testing.T) is.I {
 	return is
 }
 
+func TestMain(m *testing.M) {
+	var err error
+	if os.Getenv("AUTH_API") != "" {
+		AuthAPI = os.Getenv("AUTH_API")
+	}
+
+	if os.Getenv("PRIVATE_KEY") != "" {
+		user, err = signer.NewSignerFromHex(os.Getenv("PRIVATE_KEY"))
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		user = nil
+	}
+
+	err = Init(clientID, clientSecret, redirectURI)
+	if err != nil {
+		panic(err)
+	}
+
+	code := m.Run()
+	os.Exit(code)
+}
+
 func print(in interface{}) {
 	if reflect.TypeOf(in).Kind() == reflect.Struct {
 		in, _ = json.Marshal(in)

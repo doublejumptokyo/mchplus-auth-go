@@ -86,35 +86,13 @@ func get(path string, authorization string) ([]byte, error) {
 		path = "/" + path
 	}
 
+	url := AuthAPI + path
 	client := new(http.Client)
-	req, err := http.NewRequest("GET", AuthAPI+path, nil)
+	req, err := http.NewRequest("GET", url, nil)
 	if authorization != "" {
 		req.Header.Add("Authorization", "Bearer "+authorization)
 	}
 	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Backend returns status %d msg: %s", resp.StatusCode, string(body))
-	}
-
-	return body, nil
-}
-
-func post(path string, body []byte) ([]byte, error) {
-	if !strings.HasPrefix(path, "/") {
-		path = "/" + path
-	}
-
-	resp, err := http.Post(AuthAPI+path, "application/json", bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +104,31 @@ func post(path string, body []byte) ([]byte, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Backend returns status %d msg: %s", resp.StatusCode, string(ret))
+		return nil, fmt.Errorf("MCH+Auth Backend returns status %d  url: %s  msg: %s", resp.StatusCode, url, string(ret))
+	}
+
+	return ret, nil
+}
+
+func post(path string, body []byte) ([]byte, error) {
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
+	}
+
+	url := AuthAPI + path
+	resp, err := http.Post(url, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	ret, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("MCH+Auth Backend returns status %d  url: %s  msg: %s", resp.StatusCode, url, string(ret))
 	}
 
 	return ret, nil
