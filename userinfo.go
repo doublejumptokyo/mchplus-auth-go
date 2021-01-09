@@ -11,6 +11,7 @@ type UserInfo struct {
 	Region       string           `json:"region,omitempty"`
 	FirstService string           `json:"first_service"`
 	Since        int64            `json:"since"`
+	Birthday     string           `json:"birthday"`
 	Services     map[string]int64 `json:"services"`
 }
 

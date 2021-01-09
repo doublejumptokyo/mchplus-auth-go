@@ -7,31 +7,41 @@ import (
 )
 
 func TestLogin(t *testing.T) {
-	is := initializeTest(t)
 	if user == nil {
-		t.Skip()
+		t.Skip("user is not found")
 	}
-	print(user.Address())
+	t.Log("address: " + user.Address())
+
 	msg, state, err := Authorize(user.Address())
-	is.Nil(err)
-	// print(msg)
+	if err != nil {
+		t.Error(err)
+	}
 
 	sig, err := user.PersonalSign(msg)
-	is.Nil(err)
-	print(sig)
+	if err != nil {
+		t.Error(err)
+	}
+	t.Log("sig: " + sig)
 
 	code, err := Login(sig, user.Address(), state, "mainnet")
-	is.Nil(err)
-	// print(code)
+	if err != nil {
+		t.Error(err)
+	}
 
 	token, err := GetToken(code)
-	is.Nil(err)
+	if err != nil {
+		t.Error(err)
+	}
 	accessToken = token.AccessToken
-	print(accessToken)
+	t.Log("access token: " + accessToken)
 
 	p, err := ParseIDToken(token.IDToken, time.Now().Unix())
-	is.Nil(err)
+	if err != nil {
+		t.Error(err)
+	}
 	b, err := json.Marshal(p)
-	is.Nil(err)
-	print(string(b))
+	if err != nil {
+		t.Error(err)
+	}
+	t.Log("verified id_token: " + string(b))
 }

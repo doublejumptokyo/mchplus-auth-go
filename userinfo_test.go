@@ -5,13 +5,12 @@ import (
 )
 
 func TestUserinfo(t *testing.T) {
-	is := initializeTest(t)
 	if accessToken == "" {
-		t.Skip()
+		t.Skip("access token is not found")
 	}
-
 	u, err := GetUserInfo(accessToken)
-	is.Nil(err)
-
-	print(*u)
+	if err != nil {
+		t.Fatal(err)
+	}
+	pp(t, *u)
 }

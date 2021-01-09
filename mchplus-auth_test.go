@@ -68,6 +68,7 @@ func TestMain(m *testing.M) {
 		if err != nil {
 			panic(err)
 		}
+		fmt.Println("use user ", user.Address())
 	} else {
 		user = nil
 	}
@@ -79,6 +80,18 @@ func TestMain(m *testing.M) {
 
 	code := m.Run()
 	os.Exit(code)
+}
+
+func pp(t *testing.T, in interface{}) {
+	t.Helper()
+	if reflect.TypeOf(in).Kind() == reflect.Struct {
+		b, err := json.Marshal(in)
+		if err != nil {
+			t.Error(err)
+		}
+		in = string(b)
+	}
+	t.Log(in)
 }
 
 func print(in interface{}) {
