@@ -69,7 +69,7 @@ func TestRegisterBirthday(t *testing.T) {
 			name: "ok",
 			args: args{
 				"0xd868711BD9a2C6F1548F5f4737f71DA67d821090",
-				"2020-04-20",
+				"1989-04-20",
 			},
 			wantErr: false,
 		},
